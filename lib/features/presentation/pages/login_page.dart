@@ -1,6 +1,6 @@
+import 'package:cafe/features/presentation/pages/pos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cafe/core/constants/colors.dart';
-import 'package:cafe/features/presentation/pages/pos_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
     // logic for login
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const POSPage()),
+      MaterialPageRoute(builder: (context) => const PosPage()),
     );
   }
 
