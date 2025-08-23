@@ -1,4 +1,5 @@
 // lib/features/pos/presentation/pages/pos_page.dart
+import 'package:cafe/features/presentation/pages/manage_products_page.dart';
 import 'package:cafe/features/presentation/pages/paid_order_page.dart';
 import 'package:cafe/features/presentation/widgets/order_panel.dart';
 import 'package:cafe/features/presentation/widgets/pos_sidebar.dart';
@@ -39,7 +40,7 @@ class _PosPageState extends State<PosPage> {
   // Daftar semua halaman/konten utama
   final List<Widget> _pages = [
     const HomePage(), // Index 0
-    const Center(child: Text('Halaman Products')), // Index 2
+    const ManageProductsPage(), // Index 2
     const PaidOrderPage(), // Index 1
     const Center(child: Text('Halaman Reports')), // Index 3
     const Center(child: Text('Halaman Settings')), // Index 4
