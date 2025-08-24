@@ -71,7 +71,7 @@ class SettingsSidebar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
+          color: isSelected ? Colors.blue : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(

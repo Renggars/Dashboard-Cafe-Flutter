@@ -1,3 +1,5 @@
+// lib/app.dart
+// TIDAK ADA PERUBAHAN
 import 'package:cafe/features/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cafe/core/constants/colors.dart';
@@ -13,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.teal,
         scaffoldBackgroundColor: AppColors.background,
-        fontFamily: 'Poppins', // Anda bisa menambahkan font kustom
+        fontFamily: 'Poppins',
         appBarTheme: const AppBarTheme(
           backgroundColor: AppColors.white,
           elevation: 0,

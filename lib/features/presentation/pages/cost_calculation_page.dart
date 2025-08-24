@@ -131,7 +131,7 @@ class CostCalculationPage extends StatelessWidget {
       {required String percentage, required String name}) {
     return Card(
       elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),

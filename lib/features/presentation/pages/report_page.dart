@@ -193,6 +193,7 @@ class _ReportPageState extends State<ReportPage> {
               TextButton.icon(
                 onPressed: () {
                   // TODO: Implement PDF export logic
+                  print("PDF export logic");
                 },
                 icon: const Icon(Icons.download_for_offline_outlined),
                 label: const Text('PDF'),
@@ -223,9 +224,9 @@ class _ReportPageState extends State<ReportPage> {
       decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(8),
-          boxShadow: [
+          boxShadow: const [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey,
               spreadRadius: 2,
               blurRadius: 5,
             )
@@ -300,8 +301,8 @@ class _ReportSelectionCard extends StatelessWidget {
           ),
           boxShadow: isSelected
               ? [
-                  BoxShadow(
-                    color: Colors.blue.withOpacity(0.1),
+                  const BoxShadow(
+                    color: Colors.blueGrey,
                     spreadRadius: 2,
                     blurRadius: 5,
                   )

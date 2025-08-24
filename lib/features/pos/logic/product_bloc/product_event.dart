@@ -1,4 +1,5 @@
-part of 'product_bloc.dart';
+// lib/features/pos/logic/product_bloc/product_event.dart
+import 'package:equatable/equatable.dart';
 
 abstract class ProductEvent extends Equatable {
   const ProductEvent();
@@ -7,4 +8,4 @@ abstract class ProductEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadProducts extends ProductEvent {}
+class FetchProducts extends ProductEvent {}

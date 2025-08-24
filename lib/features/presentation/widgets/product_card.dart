@@ -1,103 +1,121 @@
+// lib/features/pos/presentation/widgets/product_card.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
+import 'package:cafe/core/constants/colors.dart';
+import 'package:cafe/features/pos/data/models/product.dart';
+import 'package:cafe/features/pos/logic/order_bloc/order_bloc.dart';
+import 'package:cafe/features/pos/logic/order_bloc/order_event.dart';
+import 'package:cafe/features/pos/logic/order_bloc/order_state.dart';
 
 class ProductCard extends StatelessWidget {
-  final String imagePath;
-  final String name;
-  final String category;
-
-  const ProductCard({
-    super.key,
-    required this.imagePath,
-    required this.name,
-    required this.category,
-  });
+  final Product product;
+  const ProductCard({super.key, required this.product});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+    final formatCurrency = NumberFormat.currency(
+        locale: 'id_ID', symbol: 'Rp. ', decimalDigits: 0);
+
+    return InkWell(
+      onTap: () {
+        context.read<OrderBloc>().add(AddProductToOrder(product));
+      },
+      borderRadius: BorderRadius.circular(14),
+      child: Card(
+        elevation: 2,
+        shadowColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Stack(
           children: [
-            Expanded(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Center(
+                      child: Image.network(
+                        // product.imageUrl,
+                        "https://picsum.photos/200",
+                        fit: BoxFit.contain,
+                        height: 80,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                      loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) =>
+                            const Icon(Icons.broken_image,
+                                size: 80, color: AppColors.fontGrey),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    product.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: AppColors.font,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                    product.categoryName ?? '',
+                    style: const TextStyle(
+                        fontSize: 16, color: AppColors.fontGrey),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    formatCurrency.format(product.price),
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.font,
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(height: 12),
-            Text(
-              name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              category,
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.black54,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildActionButton(
-                  context,
-                  icon: Icons.edit,
-                  label: 'Edit',
-                  color: Colors.blue,
-                  onTap: () {
-                    print('Edit $name');
-                  },
-                ),
-                _buildActionButton(
-                  context,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                  color: Colors.red,
-                  onTap: () {
-                    print('Delete $name');
-                  },
-                ),
-              ],
+            BlocBuilder<OrderBloc, OrderState>(
+              builder: (context, state) {
+                final orderItem = state.orderItems
+                    .where((item) => item.product.id == product.id)
+                    .firstOrNull;
+                if (orderItem != null) {
+                  return Positioned(
+                    top: 8,
+                    right: 8,
+                    child: Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: const BoxDecoration(
+                        color: AppColors.primary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Text(
+                        orderItem.quantity.toString(),
+                        style: const TextStyle(
+                            color: AppColors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required Color color,
-    required VoidCallback onTap,
-  }) {
-    return ElevatedButton.icon(
-      onPressed: onTap,
-      icon: Icon(icon, size: 18),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        foregroundColor: Colors.white,
-        backgroundColor: color,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
         ),
       ),
     );

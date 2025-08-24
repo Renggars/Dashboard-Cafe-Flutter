@@ -1,25 +1,24 @@
-import 'package:bloc/bloc.dart';
-import 'package:cafe/features/pos/data/repositories/product_repository.dart';
-import 'package:equatable/equatable.dart';
-import 'package:cafe/features/pos/data/models/product.dart';
-
-part 'product_event.dart';
-part 'product_state.dart';
+// lib/features/pos/logic/product_bloc/product_bloc.dart
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:cafe/features/pos/domain/repositories/product_repository.dart';
+import 'product_event.dart';
+import 'product_state.dart';
 
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
-  final ProductRepository _productRepository;
+  final ProductRepository productRepository;
 
-  ProductBloc(this._productRepository) : super(ProductInitial()) {
-    on<LoadProducts>(_onLoadProducts);
+  ProductBloc({required this.productRepository}) : super(ProductInitial()) {
+    on<FetchProducts>(_onFetchProducts);
   }
 
-  void _onLoadProducts(LoadProducts event, Emitter<ProductState> emit) async {
+  Future<void> _onFetchProducts(
+      FetchProducts event, Emitter<ProductState> emit) async {
     emit(ProductLoading());
     try {
-      final products = await _productRepository.getProducts();
-      emit(ProductLoaded(products));
+      final products = await productRepository.getProducts();
+      emit(ProductLoaded(products: products));
     } catch (e) {
-      emit(ProductError(e.toString()));
+      emit(ProductError(message: e.toString()));
     }
   }
 }

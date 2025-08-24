@@ -1,10 +1,12 @@
 // lib/features/pos/presentation/widgets/order_panel.dart
+import 'package:cafe/features/pos/logic/order_bloc/order_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:cafe/core/constants/colors.dart';
 import 'package:cafe/features/pos/data/models/order_item.dart';
 import 'package:cafe/features/pos/logic/order_bloc/order_bloc.dart';
+import 'package:cafe/features/pos/logic/order_bloc/order_event.dart';
 
 class OrderPanel extends StatelessWidget {
   const OrderPanel({super.key});

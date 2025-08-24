@@ -35,11 +35,11 @@ class _PosSidebarState extends State<PosSidebar> {
         children: [
           const SizedBox(height: 24),
           // Placeholder untuk logo
-          Padding(
-            padding: const EdgeInsets.all(20.0),
+          const Padding(
+            padding: EdgeInsets.all(20.0),
             child: Icon(
               Icons.vape_free, // Ganti dengan logo Anda
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white,
               size: 40,
             ),
           ),
@@ -84,8 +84,7 @@ class _PosSidebarState extends State<PosSidebar> {
         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color:
-              isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(

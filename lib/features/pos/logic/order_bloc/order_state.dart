@@ -1,17 +1,11 @@
-part of 'order_bloc.dart';
+// lib/features/pos/logic/order_bloc/order_state.dart
+import 'package:equatable/equatable.dart';
+import 'package:cafe/features/pos/data/models/order_item.dart';
 
 class OrderState extends Equatable {
   final List<OrderItem> orderItems;
 
   const OrderState({this.orderItems = const []});
-
-  double get subtotal {
-    return orderItems.fold(0, (sum, item) => sum + item.totalPrice);
-  }
-
-  int get totalItems {
-    return orderItems.fold(0, (sum, item) => sum + item.quantity);
-  }
 
   OrderState copyWith({
     List<OrderItem>? orderItems,
