@@ -1,4 +1,3 @@
-// lib/features/pos/presentation/widgets/product_grid_section.dart
 import 'package:cafe/features/presentation/widgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -7,6 +6,8 @@ import 'package:cafe/core/constants/colors.dart';
 import 'package:cafe/features/pos/logic/product_bloc/product_bloc.dart';
 import 'package:cafe/features/pos/logic/product_bloc/product_event.dart';
 import 'package:cafe/features/pos/logic/product_bloc/product_state.dart';
+import 'package:cafe/features/pos/data/repositories/category_repository_impl.dart';
+import 'package:cafe/features/pos/data/models/category.dart';
 
 class ProductGridSection extends StatefulWidget {
   const ProductGridSection({super.key});
@@ -16,12 +17,16 @@ class ProductGridSection extends StatefulWidget {
 }
 
 class _ProductGridSectionState extends State<ProductGridSection> {
-  String _selectedCategory = 'all'; // Menggunakan String untuk lebih fleksibel
+  String _selectedCategory = 'all';
   final _searchController = TextEditingController();
+  final _categoryRepository = CategoryRepositoryImpl();
+  late Future<List<Category>> _categoriesFuture;
 
   @override
   void initState() {
     super.initState();
+    // Inisialisasi future untuk mengambil kategori di initState
+    _categoriesFuture = _categoryRepository.getCategories();
     context.read<ProductBloc>().add(FetchProducts());
   }
 
@@ -108,60 +113,69 @@ class _ProductGridSectionState extends State<ProductGridSection> {
   }
 
   Widget _buildCategoryFilters() {
-    final categories = [
-      {'name': 'All', 'icon': Icons.menu_book},
-      {'name': 'Beverages', 'icon': Icons.local_cafe},
-      {'name': 'Snacks', 'icon': Icons.fastfood},
-      {'name': 'Main Course', 'icon': Icons.dinner_dining},
-      {'name': 'Desserts', 'icon': Icons.cake},
-    ];
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: categories.map((cat) {
-          return _buildCategoryButton(
-            categoryName: cat['name'] as String,
-            icon: cat['icon'] as IconData,
+    return FutureBuilder<List<Category>>(
+      future: _categoriesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          // Tampilkan loading saat data kategori sedang diambil
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          // Tampilkan pesan error jika pengambilan data gagal
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (snapshot.hasData) {
+          // Jika data berhasil diambil
+          final categories = snapshot.data!;
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: categories.map((category) {
+                final bool isSelected =
+                    _selectedCategory == category.name.toLowerCase();
+                return Padding(
+                  padding: const EdgeInsets.only(right: 16),
+                  child: ElevatedButton(
+                    onPressed: () {
+                      setState(() {
+                        _selectedCategory = category.name.toLowerCase();
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          isSelected ? AppColors.primary : AppColors.white,
+                      foregroundColor:
+                          isSelected ? AppColors.white : AppColors.primary,
+                      elevation: isSelected ? 4 : 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                        side: isSelected
+                            ? BorderSide.none
+                            : const BorderSide(
+                                color: AppColors.fontGrey, width: 1),
+                      ),
+                      minimumSize: const Size(120, 80),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 16, horizontal: 12),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Menggunakan Icon yang sesuai atau hanya Teks
+                        const Icon(Icons.category,
+                            size: 30), // Ganti dengan ikon yang relevan
+                        const SizedBox(height: 6),
+                        Text(category.name,
+                            style: const TextStyle(fontSize: 16)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
           );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildCategoryButton(
-      {required String categoryName, required IconData icon}) {
-    final bool isSelected = _selectedCategory == categoryName.toLowerCase();
-    return Padding(
-      padding: const EdgeInsets.only(right: 16),
-      child: ElevatedButton(
-        onPressed: () {
-          setState(() {
-            _selectedCategory = categoryName.toLowerCase();
-          });
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected ? AppColors.primary : AppColors.white,
-          foregroundColor: isSelected ? AppColors.white : AppColors.primary,
-          elevation: isSelected ? 4 : 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-            side: isSelected
-                ? BorderSide.none
-                : const BorderSide(color: AppColors.fontGrey, width: 1),
-          ),
-          minimumSize: const Size(120, 80),
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 30),
-            const SizedBox(height: 6),
-            Text(categoryName, style: const TextStyle(fontSize: 16)),
-          ],
-        ),
-      ),
+        } else {
+          return const SizedBox.shrink();
+        }
+      },
     );
   }
 
@@ -172,7 +186,6 @@ class _ProductGridSectionState extends State<ProductGridSection> {
           return const Center(child: CircularProgressIndicator());
         }
         if (state is ProductLoaded) {
-          // Asumsi: product model memiliki properti `category` (string)
           final filteredProducts = _selectedCategory == 'all'
               ? state.products
               : state.products
