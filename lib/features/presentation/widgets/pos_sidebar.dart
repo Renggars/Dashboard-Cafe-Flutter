@@ -22,10 +22,8 @@ class _PosSidebarState extends State<PosSidebar> {
     {'icon': Icons.home_outlined, 'notification': 0},
     {'icon': Icons.production_quantity_limits, 'notification': 0},
     {'icon': Icons.receipt_long_outlined, 'notification': 31},
-    {'icon': Icons.inventory_2_outlined, 'notification': 0},
     {'icon': Icons.bar_chart_outlined, 'notification': 0},
     {'icon': Icons.settings_outlined, 'notification': 0},
-    {'icon': Icons.dashboard_outlined, 'notification': 0},
   ];
 
   @override

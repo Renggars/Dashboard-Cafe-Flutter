@@ -1,6 +1,7 @@
 // lib/features/pos/presentation/pages/pos_page.dart
 import 'package:cafe/features/presentation/pages/manage_products_page.dart';
 import 'package:cafe/features/presentation/pages/paid_order_page.dart';
+import 'package:cafe/features/presentation/pages/report_page.dart';
 import 'package:cafe/features/presentation/widgets/order_panel.dart';
 import 'package:cafe/features/presentation/widgets/pos_sidebar.dart';
 import 'package:cafe/features/presentation/widgets/product_grid_section.dart';
@@ -42,8 +43,8 @@ class _PosPageState extends State<PosPage> {
     const HomePage(), // Index 0
     const ManageProductsPage(), // Index 2
     const PaidOrderPage(), // Index 1
-    const Center(child: Text('Halaman Reports')), // Index 3
-    const Center(child: Text('Halaman Settings')), // Index 4
+    const ReportPage(), // Index 3
+    // const SettingsPage(), // Index 4
   ];
 
   // Fungsi untuk mengubah halaman
