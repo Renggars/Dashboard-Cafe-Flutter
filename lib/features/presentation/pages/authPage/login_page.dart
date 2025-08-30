@@ -1,6 +1,6 @@
-import 'package:cafe/features/presentation/pages/pos_page.dart';
+import '../homePage/pos_page.dart';
 import 'package:flutter/material.dart';
-import 'package:cafe/core/constants/colors.dart';
+import '../../../../core/constants/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

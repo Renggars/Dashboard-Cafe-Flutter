@@ -1,4 +1,4 @@
-import 'package:cafe/features/presentation/widgets/product_card.dart';
+import 'package:cafe/features/presentation/widgets/homeWidgets/product_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
@@ -147,10 +147,8 @@ class _ProductGridSectionState extends State<ProductGridSection> {
                       elevation: isSelected ? 4 : 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
-                        side: isSelected
-                            ? BorderSide.none
-                            : const BorderSide(
-                                color: AppColors.fontGrey, width: 1),
+                        side: const BorderSide(
+                            color: AppColors.primary, width: 2),
                       ),
                       minimumSize: const Size(120, 80),
                       padding: const EdgeInsets.symmetric(
@@ -159,12 +157,9 @@ class _ProductGridSectionState extends State<ProductGridSection> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Menggunakan Icon yang sesuai atau hanya Teks
-                        const Icon(Icons.category,
-                            size: 30), // Ganti dengan ikon yang relevan
                         const SizedBox(height: 6),
                         Text(category.name,
-                            style: const TextStyle(fontSize: 16)),
+                            style: const TextStyle(fontSize: 20)),
                       ],
                     ),
                   ),

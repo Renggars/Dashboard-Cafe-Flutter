@@ -1,6 +1,6 @@
 // lib/app.dart
-// TIDAK ADA PERUBAHAN
-import 'package:cafe/features/presentation/pages/login_page.dart';
+// import 'package:cafe/features/presentation/pages/login_page.dart';
+import 'package:cafe/features/presentation/pages/homePage/pos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cafe/core/constants/colors.dart';
 
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const LoginPage(),
+      home: const PosPage(),
     );
   }
 }

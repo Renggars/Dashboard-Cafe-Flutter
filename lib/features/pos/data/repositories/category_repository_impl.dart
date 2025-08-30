@@ -17,8 +17,8 @@ class CategoryRepositoryImpl implements CategoryRepository {
         final List<dynamic> categoryJsonList =
             responseData['data']['categories'];
 
-        // Tambahkan kategori "all" secara manual di awal daftar
-        final List<Category> categories = [Category(id: 0, name: 'all')];
+        // Tambahkan kategori "All" secara manual di awal daftar
+        final List<Category> categories = [Category(id: 0, name: 'All')];
 
         categories.addAll(
             categoryJsonList.map((json) => Category.fromJson(json)).toList());

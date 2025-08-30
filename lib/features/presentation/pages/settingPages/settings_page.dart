@@ -1,9 +1,9 @@
 // lib/features/pos/presentation/pages/settings_page.dart
-import 'package:cafe/features/presentation/pages/manage_discounts_page.dart';
-import 'package:cafe/features/presentation/pages/manage_printers_page.dart';
-import 'package:cafe/features/presentation/pages/cost_calculation_page.dart';
-import 'package:cafe/features/presentation/pages/sync_data_page.dart';
-import 'package:cafe/features/presentation/widgets/settings_sidebar.dart';
+import 'package:cafe/features/presentation/pages/settingPages/cost_calculation_page.dart';
+import 'package:cafe/features/presentation/pages/settingPages/manage_discounts_page.dart';
+import 'package:cafe/features/presentation/pages/settingPages/manage_printers_page.dart';
+import 'package:cafe/features/presentation/pages/settingPages/sync_data_page.dart';
+import 'package:cafe/features/presentation/widgets/settingWidgets/settings_sidebar.dart';
 import 'package:flutter/material.dart';
 
 class SettingsPage extends StatefulWidget {

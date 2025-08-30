@@ -38,7 +38,7 @@ class _PosSidebarState extends State<PosSidebar> {
           const Padding(
             padding: EdgeInsets.all(20.0),
             child: Icon(
-              Icons.vape_free, // Ganti dengan logo Anda
+              Icons.network_check_rounded, // Ganti dengan logo Anda
               color: Colors.white,
               size: 40,
             ),
@@ -84,7 +84,8 @@ class _PosSidebarState extends State<PosSidebar> {
         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.white : Colors.transparent,
+          color:
+              isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(

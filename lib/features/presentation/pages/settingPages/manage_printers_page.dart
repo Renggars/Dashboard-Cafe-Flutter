@@ -1,4 +1,5 @@
 // lib/features/pos/presentation/pages/manage_printers_page.dart
+import 'package:cafe/core/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class ManagePrintersPage extends StatefulWidget {
@@ -10,7 +11,7 @@ class ManagePrintersPage extends StatefulWidget {
 
 class _ManagePrintersPageState extends State<ManagePrintersPage> {
   String _selectedSize = '80 mm'; // State untuk ukuran yang dipilih
-  List<String> _connectedPrinters = [
+  final List<String> _connectedPrinters = [
     'Printer XYZ',
     'Printer ABC'
   ]; // Contoh data printer
@@ -234,7 +235,7 @@ class _ManagePrintersPageState extends State<ManagePrintersPage> {
           debugPrint('Saving printer configuration...');
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF10B981), // Warna hijau
+          backgroundColor: AppColors.primary, // Warna hijau
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

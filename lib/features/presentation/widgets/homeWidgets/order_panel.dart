@@ -98,7 +98,7 @@ class OrderPanel extends StatelessWidget {
                       ),
               ),
               const SizedBox(height: 20),
-              _buildTransactionOptions(),
+              _buildServiceFeeOptions(),
               const SizedBox(height: 20),
               _buildTransactionSummary(
                 subTotal: subTotal,
@@ -136,25 +136,25 @@ class OrderPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildTransactionOptions() {
+  Widget _buildServiceFeeOptions() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
-        _buildOptionCard(
+        _buildFeeOptionCard(
           icon: Icons.discount,
           label: 'Diskon',
           onTap: () {
             // Aksi untuk menerapkan diskon
           },
         ),
-        _buildOptionCard(
+        _buildFeeOptionCard(
           icon: Icons.percent,
           label: 'Pajak PB1',
           onTap: () {
             // Aksi untuk menerapkan pajak
           },
         ),
-        _buildOptionCard(
+        _buildFeeOptionCard(
           icon: Icons.room_service,
           label: 'Layanan',
           onTap: () {
@@ -165,16 +165,21 @@ class OrderPanel extends StatelessWidget {
     );
   }
 
-  Widget _buildOptionCard(
+  Widget _buildFeeOptionCard(
       {required IconData icon,
       required String label,
       required VoidCallback onTap}) {
     return Expanded(
       child: Card(
-        elevation: 2,
+        color: Colors.white,
+        elevation: 4,
+        shadowColor: Colors.grey[300],
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+            borderRadius: BorderRadius.circular(12),
+            side: BorderSide(
+              color: Colors.grey[200]!,
+              width: 1,
+            )),
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12),
@@ -334,8 +339,13 @@ class OrderListItem extends StatelessWidget {
   Widget _buildQuantitySelector(BuildContext context, OrderItem item) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.secondary,
+        color: Colors
+            .grey[100], // ⬅️ putih agak abu biar beda dari background utama
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Colors.grey[300]!, // border tipis biar lebih jelas
+          width: 1,
+        ),
       ),
       child: Row(
         children: [

@@ -15,12 +15,14 @@ class Product extends Equatable {
   final String name;
   final int price;
   final String? categoryName;
+  final String? imageUrl;
 
   const Product({
     required this.id,
     required this.name,
     required this.price,
     this.categoryName,
+    this.imageUrl,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) {
@@ -31,10 +33,13 @@ class Product extends Equatable {
       id: json['id'] as int,
       name: json['name'] as String,
       price: json['price'] as int,
+      imageUrl: json['imageUrl'] as String?,
       categoryName: categoryName,
     );
   }
 
   @override
-  List<Object?> get props => [id, name, price, categoryName];
+  List<Object?> get props => [id, name, price, imageUrl, categoryName];
+
+  get category => null;
 }

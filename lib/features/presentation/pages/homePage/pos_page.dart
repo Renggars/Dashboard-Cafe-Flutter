@@ -1,11 +1,11 @@
 // lib/features/pos/presentation/pages/pos_page.dart
 // import 'package:cafe/features/presentation/pages/manage_products_page.dart';
-import 'package:cafe/features/presentation/pages/paid_order_page.dart';
-import 'package:cafe/features/presentation/pages/report_page.dart';
-import 'package:cafe/features/presentation/pages/settings_page.dart';
-import 'package:cafe/features/presentation/widgets/order_panel.dart';
-import 'package:cafe/features/presentation/widgets/pos_sidebar.dart';
-import 'package:cafe/features/presentation/widgets/product_grid_section.dart';
+import 'package:cafe/features/presentation/pages/homePage/paid_order_page.dart';
+import 'package:cafe/features/presentation/pages/reportPage/report_page.dart';
+import 'package:cafe/features/presentation/pages/settingPages/settings_page.dart';
+import 'package:cafe/features/presentation/widgets/homeWidgets/order_panel.dart';
+import 'package:cafe/features/presentation/widgets/homeWidgets/pos_sidebar.dart';
+import 'package:cafe/features/presentation/widgets/homeWidgets/product_grid_section.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
