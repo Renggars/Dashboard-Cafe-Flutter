@@ -4,10 +4,7 @@ import 'package:cafe/core/constants/colors.dart'; // Pastikan path ini benar
 class PosSidebar extends StatefulWidget {
   final void Function(int index) onMenuTapped;
 
-  const PosSidebar({
-    super.key,
-    required this.onMenuTapped,
-  });
+  const PosSidebar({super.key, required this.onMenuTapped});
 
   @override
   State<PosSidebar> createState() => _PosSidebarState();
@@ -84,8 +81,9 @@ class _PosSidebarState extends State<PosSidebar> {
         margin: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
         padding: const EdgeInsets.all(12.0),
         decoration: BoxDecoration(
-          color:
-              isSelected ? Colors.white.withOpacity(0.2) : Colors.transparent,
+          color: isSelected
+              ? Colors.white.withOpacity(0.2)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(10),
         ),
         child: Stack(
@@ -108,13 +106,11 @@ class _PosSidebarState extends State<PosSidebar> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         decoration: BoxDecoration(
-            color: Colors.red,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: AppColors.primary, width: 2)),
-        constraints: const BoxConstraints(
-          minWidth: 22,
-          minHeight: 22,
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: AppColors.primary, width: 2),
         ),
+        constraints: const BoxConstraints(minWidth: 22, minHeight: 22),
         child: Text(
           '$count',
           style: const TextStyle(
