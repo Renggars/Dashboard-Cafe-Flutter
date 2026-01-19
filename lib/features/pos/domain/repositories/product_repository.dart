@@ -1,4 +1,4 @@
-// lib/features/pos/domain/repositories/product_repository.dart
+// lib/features/pos/data/repositories/product_repository.dart
 
 import 'package:cafe/features/pos/data/models/product.dart';
 

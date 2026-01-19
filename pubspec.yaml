@@ -35,7 +35,10 @@ dependencies:
   flutter_bloc: ^9.1.1
   get_it: ^8.2.0
   http: ^1.5.0
+  http_parser: ^4.1.2
+  image_picker: ^1.2.1
   intl: ^0.20.2
+  shared_preferences: ^2.5.4
 
 dev_dependencies:
   flutter_lints: ^4.0.0

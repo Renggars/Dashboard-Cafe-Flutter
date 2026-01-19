@@ -5,7 +5,8 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'app.dart';
 import 'features/pos/logic/order_bloc/order_bloc.dart';
 import 'features/pos/logic/product_bloc/product_bloc.dart';
-import 'injection.dart'; // DIUBAH: Import file injection
+import 'injection.dart';
+import 'package:cafe/features/pos/logic/product_bloc/product_event.dart';
 
 void main() async {
   // BARU: Pastikan semua binding Flutter siap sebelum menjalankan kode async.
@@ -27,7 +28,8 @@ void main() async {
         // DIUBAH: BLoC dibuat dengan mengambil instance dari GetIt.
         // Tidak ada lagi event `add(LoadProducts())` di sini.
         BlocProvider(
-          create: (context) => getIt<ProductBloc>(),
+          create: (context) =>
+              getIt<ProductBloc>()..add(FetchProducts()), // Tambahkan ..add()
         ),
         BlocProvider(
           create: (context) => getIt<OrderBloc>(),

@@ -1,3 +1,5 @@
+// lib/features/pos/data/models/product.dart
+
 import 'package:equatable/equatable.dart';
 
 enum ProductCategory {
@@ -27,14 +29,15 @@ class Product extends Equatable {
 
   factory Product.fromJson(Map<String, dynamic> json) {
     final categoryData = json['category'] as Map<String, dynamic>?;
-    final categoryName = categoryData?['name'] as String?;
 
     return Product(
       id: json['id'] as int,
       name: json['name'] as String,
       price: json['price'] as int,
-      imageUrl: json['imageUrl'] as String?,
-      categoryName: categoryName,
+      imageUrl: json['imageUrl'] != null
+          ? 'http://10.0.2.2:4001${json['imageUrl']}'
+          : null,
+      categoryName: categoryData?['name'] as String?,
     );
   }
 

@@ -35,6 +35,7 @@ class ProductCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// ================= IMAGE =================
                   Expanded(
                     child: ClipRRect(
                       borderRadius: const BorderRadius.only(
@@ -46,6 +47,8 @@ class ProductCard extends StatelessWidget {
                         fit: BoxFit.cover,
                         width: double.infinity,
                         height: double.infinity,
+
+                        /// ===== LOADING =====
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return Center(
@@ -57,13 +60,23 @@ class ProductCard extends StatelessWidget {
                             ),
                           );
                         },
-                        errorBuilder: (context, error, stackTrace) =>
-                            const Icon(Icons.broken_image,
-                                size: 80, color: AppColors.fontGrey),
+
+                        /// ===== ERROR DEBUG =====
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Center(
+                            child: Icon(
+                              Icons.broken_image,
+                              size: 60,
+                              color: AppColors.fontGrey,
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ),
                   const SizedBox(height: 10),
+
+                  /// ================= NAME =================
                   Text(
                     product.name,
                     style: const TextStyle(
@@ -74,12 +87,16 @@ class ProductCard extends StatelessWidget {
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
+
+                  /// ================= CATEGORY =================
                   Text(
                     product.categoryName ?? '',
                     style: const TextStyle(
                         fontSize: 16, color: AppColors.fontGrey),
                   ),
                   const SizedBox(height: 10),
+
+                  /// ================= PRICE =================
                   Text(
                     formatCurrency.format(product.price),
                     style: const TextStyle(
@@ -91,6 +108,8 @@ class ProductCard extends StatelessWidget {
                 ],
               ),
             ),
+
+            /// ================= ORDER BADGE =================
             BlocBuilder<OrderBloc, OrderState>(
               builder: (context, state) {
                 final orderItem = state.orderItems

@@ -80,12 +80,10 @@ class CostCalculationPage extends StatelessWidget {
               // Kartu untuk menambah perhitungan
               _buildAddCalculationCard(type),
               // Daftar kartu perhitungan yang sudah ada
-              ...items
-                  .map((item) => _buildCalculationCard(
-                        percentage: item['percentage']!,
-                        name: item['name']!,
-                      ))
-                  .toList(),
+              ...items.map((item) => _buildCalculationCard(
+                    percentage: item['percentage']!,
+                    name: item['name']!,
+                  )),
             ],
           ),
         ),
