@@ -29,29 +29,45 @@ class SettingsSidebar extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
+
+          // INDEX 0
           _buildMenuItem(
             icon: Icons.percent,
             label: 'Kelola Diskon',
-            subtitle: 'Kelola Diskon Pelanggan',
+            subtitle: 'Atur diskon global',
             index: 0,
           ),
+
+          // INDEX 1
+          _buildMenuItem(
+            icon: Icons.room_service,
+            label: 'Biaya Layanan',
+            subtitle: 'Atur service charge',
+            index: 1,
+          ),
+
+          // INDEX 2
+          _buildMenuItem(
+            icon: Icons.receipt_long,
+            label: 'Pajak (PB1)',
+            subtitle: 'Atur pajak restoran',
+            index: 2,
+          ),
+
+          // INDEX 3
           _buildMenuItem(
             icon: Icons.print,
             label: 'Kelola Printer',
-            subtitle: 'Tambah atau hapus printer',
-            index: 1,
+            subtitle: 'Atur printer struk & dapur',
+            index: 3,
           ),
-          _buildMenuItem(
-            icon: Icons.monetization_on,
-            label: 'Perhitungan Biaya',
-            subtitle: 'Kelola biaya diluar biaya modal',
-            index: 2,
-          ),
+
+          // INDEX 4
           _buildMenuItem(
             icon: Icons.sync,
             label: 'Sync Data',
-            subtitle: 'Sinkronisasi data dari dan ke server',
-            index: 3,
+            subtitle: 'Sinkronisasi data server',
+            index: 4,
           ),
         ],
       ),
@@ -71,7 +87,7 @@ class SettingsSidebar extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.blue.withOpacity(0.2) : Colors.transparent,
+          color: isSelected ? Colors.blue.withOpacity(0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -88,15 +104,16 @@ class SettingsSidebar extends StatelessWidget {
                   Text(
                     label,
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      fontWeight:
+                          isSelected ? FontWeight.bold : FontWeight.w500,
                       color: isSelected ? Colors.blue : Colors.black,
                     ),
                   ),
                   Text(
                     subtitle,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 11,
                       color: Colors.grey[600],
                     ),
                   ),

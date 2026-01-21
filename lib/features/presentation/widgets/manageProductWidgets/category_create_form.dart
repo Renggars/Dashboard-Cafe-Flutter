@@ -14,8 +14,15 @@ class _CategoryCreateFormState extends State<CategoryCreateForm> {
   final _nameController = TextEditingController();
   bool _isSubmitting = false;
 
+  final Color primaryBlue = const Color(0xFF0061FF);
+
   Future<void> _handleCreate() async {
-    if (_nameController.text.isEmpty) return;
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Nama kategori tidak boleh kosong")),
+      );
+      return;
+    }
 
     setState(() => _isSubmitting = true);
     final prefs = await SharedPreferences.getInstance();
@@ -27,7 +34,11 @@ class _CategoryCreateFormState extends State<CategoryCreateForm> {
       _nameController.clear();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Kategori berhasil ditambahkan")),
+          SnackBar(
+            content: const Text("Kategori berhasil ditambahkan"),
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+          ),
         );
       }
     }
@@ -36,39 +47,139 @@ class _CategoryCreateFormState extends State<CategoryCreateForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(24.0),
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      padding: const EdgeInsets.all(32.0),
+      color: const Color(0xFFF8FAFC), // Background abu-abu sangat muda
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text("Create Category",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 20),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _nameController,
-                      decoration: const InputDecoration(
-                        hintText: "Nama Kategori (Contoh: Makanan Berat)",
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: _isSubmitting ? null : _handleCreate,
-                    icon: const Icon(Icons.add),
-                    label: Text(_isSubmitting ? "Saving..." : "Save Category"),
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 24, vertical: 20),
-                    ),
+          // Header Page
+          const Text(
+            "Create New Category",
+            style: TextStyle(
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF1E293B),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            "Tambahkan kategori baru untuk mengelompokkan menu Anda",
+            style: TextStyle(fontSize: 16, color: Colors.blueGrey),
+          ),
+          const SizedBox(height: 48),
+
+          // Centralized Form
+          Center(
+            child: Container(
+              constraints: const BoxConstraints(maxWidth: 600),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.04),
+                    blurRadius: 24,
+                    offset: const Offset(0, 8),
                   ),
                 ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(40.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Icon Header
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: primaryBlue.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(Icons.category_rounded,
+                          color: primaryBlue, size: 40),
+                    ),
+                    const SizedBox(height: 24),
+                    const Text(
+                      "Detail Kategori",
+                      style:
+                          TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 32),
+
+                    // Input Field
+                    TextField(
+                      controller: _nameController,
+                      style: const TextStyle(fontSize: 18),
+                      decoration: InputDecoration(
+                        labelText: "Nama Kategori",
+                        hintText: "Contoh: Makanan Berat, Coffee, Drink",
+                        prefixIcon:
+                            Icon(Icons.edit_note_rounded, color: primaryBlue),
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide.none,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: Colors.grey.shade200),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(color: primaryBlue, width: 2),
+                        ),
+                        floatingLabelStyle: TextStyle(
+                            color: primaryBlue, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+
+                    // Action Button
+                    SizedBox(
+                      width: double.infinity,
+                      height: 60,
+                      child: ElevatedButton(
+                        onPressed: _isSubmitting ? null : _handleCreate,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryBlue,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                ),
+                              )
+                            : const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.save_rounded),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    "Simpan Kategori",
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

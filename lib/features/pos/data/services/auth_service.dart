@@ -1,52 +1,43 @@
+// lib/features/pos/data/services/auth_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cafe/core/data/datasources/auth_local_datasource.dart';
+import 'package:cafe/injection.dart';
 
 class AuthService {
   final String baseUrl = "http://10.0.2.2:4001/v1";
+  // Panggil datasource dari GetIt
+  final _local = getIt<AuthLocalDatasource>();
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/auth/login'),
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          "email": email,
-          "password": password,
-        }),
+        body: jsonEncode({"email": email, "password": password}),
       );
 
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
-        final prefs = await SharedPreferences.getInstance();
+        // Ekstraksi data dari JSON
+        final data = responseData['data'];
+        final String accessToken = data['tokens']['access']['token'];
+        final String refreshToken = data['tokens']['refresh']['token'];
+        final String username = data['user']['username'];
 
-        // Mengikuti struktur JSON: data -> tokens -> access -> token
-        final String accessToken =
-            responseData['data']['tokens']['access']['token'];
-        final String refreshToken =
-            responseData['data']['tokens']['refresh']['token'];
-        final String username = responseData['data']['user']['username'];
+        // Simpan menggunakan datasource
+        await _local.saveAuthData(accessToken, refreshToken, username);
 
-        // Simpan data yang diperlukan ke lokal
-        await prefs.setString('token', accessToken);
-        await prefs.setString('refresh_token', refreshToken);
-        await prefs.setString('username', username);
-
-        return {
-          "success": true,
-          "message": responseData['message'] ?? "Login success"
-        };
+        return {"success": true, "message": "Login success"};
       } else {
-        // Jika status bukan 200, ambil pesan error dari API jika ada
         return {
           "success": false,
           "message": responseData['message'] ?? "Login failed"
         };
       }
     } catch (e) {
-      // Ini akan menangkap error jika parsing JSON gagal atau masalah koneksi
-      return {"success": false, "message": "Terjadi kesalahan: $e"};
+      return {"success": false, "message": "Koneksi gagal: $e"};
     }
   }
 }

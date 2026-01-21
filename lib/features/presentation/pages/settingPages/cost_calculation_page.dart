@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 
 class CostCalculationPage extends StatelessWidget {
-  const CostCalculationPage({super.key});
+  final String type; // Tambahkan parameter type
+  const CostCalculationPage({super.key, required this.type});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,5 @@
 // lib/app.dart
-// import 'package:cafe/features/presentation/pages/login_page.dart';
 import 'package:cafe/features/presentation/pages/authPage/login_page.dart';
-import 'package:cafe/features/presentation/pages/homePage/pos_page.dart';
 import 'package:flutter/material.dart';
 import 'package:cafe/core/constants/colors.dart';
 

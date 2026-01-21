@@ -1,8 +1,7 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cafe/features/pos/data/services/product_service.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:cafe/features/pos/data/services/category_service.dart';
+import 'dart:developer' as dev;
 
 class ProductListModule extends StatefulWidget {
   const ProductListModule({super.key});
@@ -12,248 +11,341 @@ class ProductListModule extends StatefulWidget {
 }
 
 class _ProductListModuleState extends State<ProductListModule> {
-  final _service = ProductService();
-  List<Map<String, dynamic>> _products = [];
-  bool _loading = true;
+  final _productService = ProductService();
+  final _categoryService = CategoryService();
+
+  // Konfigurasi Server
+  final String baseUrl = "http://10.0.2.2:4001";
+
+  List<dynamic> _allProducts = [];
+  List<dynamic> _filteredProducts = [];
+  List<dynamic> _categories = [];
+
+  bool _isLoading = true;
+  String _searchQuery = "";
+  String _selectedCategory = "All";
+
+  final Color primaryBlue = const Color(0xFF0061FF);
 
   @override
   void initState() {
     super.initState();
-    _fetchData();
+    _loadData();
   }
 
-  // Ambil Data dari API
-  Future<void> _fetchData() async {
-    setState(() => _loading = true);
-    final data = await _service.getMenus();
-    setState(() {
-      _products = data;
-      _loading = false;
-    });
-  }
+  Future<void> _loadData() async {
+    setState(() => _isLoading = true);
+    try {
+      final products = await _productService.getMenus();
+      final categories = await _categoryService.getCategories();
 
-  // Fungsi Hapus dengan Konfirmasi
-  Future<void> _handleDelete(int id) async {
-    final confirm = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Hapus Produk?"),
-        content: const Text("Tindakan ini tidak dapat dibatalkan."),
-        actions: [
-          TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text("Batal")),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text("Hapus", style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm == true) {
-      final prefs = await SharedPreferences.getInstance();
-      final token = prefs.getString('token') ?? "";
-      final success = await _service.deleteProduct(id, token);
-
-      if (success) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(const SnackBar(content: Text("Produk dihapus")));
-        _fetchData(); // Refresh list
-      }
+      setState(() {
+        _allProducts = products;
+        _filteredProducts = products;
+        _categories = categories;
+        _isLoading = false;
+      });
+    } catch (e) {
+      dev.log("Error loading data: $e");
+      setState(() => _isLoading = false);
     }
   }
 
-  // Fungsi Edit menggunakan Modal Bottom Sheet
-  void _showEditModal(Map<String, dynamic> product) {
-    showDialog(
-      context: context,
-      builder: (context) => EditProductDialog(
-        product: product,
-        onSuccess: () {
-          Navigator.pop(context);
-          _fetchData();
-        },
-      ),
-    );
+  void _applyFilter() {
+    setState(() {
+      _filteredProducts = _allProducts.where((product) {
+        final name = (product['name'] ?? "").toString().toLowerCase();
+        final matchesSearch = name.contains(_searchQuery.toLowerCase());
+
+        final categoryName =
+            product['category'] != null ? product['category']['name'] : "";
+        final matchesCategory =
+            _selectedCategory == "All" || categoryName == _selectedCategory;
+
+        return matchesSearch && matchesCategory;
+      }).toList();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
+    return LayoutBuilder(builder: (context, constraints) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            const SizedBox(height: 24),
+            _buildFilterAndSearchSection(),
+            const SizedBox(height: 24),
+            Expanded(
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator(color: primaryBlue))
+                  : _buildModernProductTable(constraints.maxWidth),
+            ),
+          ],
+        ),
+      );
+    });
+  }
 
-    return Padding(
-      padding: const EdgeInsets.all(24),
-      child: Card(
-        elevation: 2,
-        child: SizedBox(
-          width: double.infinity,
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: DataTable(
-              headingRowColor: WidgetStateProperty.all(Colors.grey[100]),
-              columns: const [
-                DataColumn(label: Text('Image')),
-                DataColumn(label: Text('Name')),
-                DataColumn(label: Text('Category')),
-                DataColumn(label: Text('Price')),
-                DataColumn(label: Text('Actions')),
+  Widget _buildHeader() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text("Daftar Produk",
+                style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF1F2937))),
+            Text("Total ${_allProducts.length} menu tersedia",
+                style: const TextStyle(fontSize: 16, color: Colors.grey)),
+          ],
+        ),
+        ElevatedButton.icon(
+          onPressed: _loadData,
+          icon: const Icon(Icons.refresh_rounded),
+          label: const Text("Refresh Data"),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primaryBlue.withOpacity(0.1),
+            foregroundColor: primaryBlue,
+            elevation: 0,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildFilterAndSearchSection() {
+    return Row(
+      children: [
+        Expanded(
+          flex: 2,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)
               ],
-              rows: _products.map((p) {
-                return DataRow(cells: [
-                  DataCell(
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          "http://10.0.2.2:4001${p['imageUrl']}",
-                          width: 50,
-                          height: 50,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              const Icon(Icons.broken_image),
-                        ),
+            ),
+            child: TextField(
+              onChanged: (val) {
+                _searchQuery = val;
+                _applyFilter();
+              },
+              decoration: InputDecoration(
+                hintText: "Cari nama produk...",
+                prefixIcon: Icon(Icons.search_rounded, color: primaryBlue),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(vertical: 18),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 20),
+        Expanded(
+          flex: 3,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildFilterChip("All"),
+                ..._categories.map((cat) => _buildFilterChip(cat['name'])),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFilterChip(String label) {
+    bool isSelected = _selectedCategory == label;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedCategory = label;
+          _applyFilter();
+        });
+      },
+      child: Container(
+        margin: const EdgeInsets.only(right: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? primaryBlue : Colors.white,
+          borderRadius: BorderRadius.circular(30),
+          border: Border.all(
+              color: isSelected ? primaryBlue : Colors.grey.shade300),
+        ),
+        child: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : Colors.grey.shade700,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildModernProductTable(double maxWidth) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: SingleChildScrollView(
+          scrollDirection: Axis.vertical,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minWidth: maxWidth - 64),
+              child: DataTable(
+                headingRowColor:
+                    MaterialStateProperty.all(const Color(0xFFF9FAFB)),
+                dataRowMaxHeight: 110,
+                headingRowHeight: 70,
+                horizontalMargin: 24,
+                columnSpacing: 20,
+                columns: const [
+                  DataColumn(
+                      label: Text('GAMBAR',
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(
+                      label: Text('NAMA PRODUK',
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(
+                      label: Text('KATEGORI',
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(
+                      label: Text('HARGA',
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                  DataColumn(
+                      label: Text('AKSI',
+                          style: TextStyle(fontWeight: FontWeight.bold))),
+                ],
+                rows: _filteredProducts.map((product) {
+                  // Penanganan URL Gambar
+                  final String? rawPath = product['imageUrl'];
+                  String fullImageUrl = "";
+                  if (rawPath != null && rawPath.isNotEmpty) {
+                    fullImageUrl = rawPath.startsWith('http')
+                        ? rawPath
+                        : "$baseUrl$rawPath";
+                  }
+
+                  return DataRow(cells: [
+                    DataCell(_buildImageWidget(fullImageUrl)),
+                    DataCell(
+                      SizedBox(
+                        width: maxWidth * 0.25, // Agar kolom nama lebar
+                        child: Text(product['name'] ?? "-",
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 17)),
                       ),
                     ),
-                  ),
-                  DataCell(Text(p['name'])),
-                  DataCell(Text(p['category']['name'])),
-                  DataCell(Text("Rp ${p['price']}")),
-                  DataCell(Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.edit, color: Colors.blue),
-                        onPressed: () => _showEditModal(p),
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => _handleDelete(p['id']),
-                      ),
-                    ],
-                  )),
-                ]);
-              }).toList(),
+                    DataCell(_buildCategoryBadge(
+                        product['category']?['name'] ?? "-")),
+                    DataCell(Text("Rp ${product['price']}",
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600))),
+                    DataCell(_buildActionButtons()),
+                  ]);
+                }).toList(),
+              ),
             ),
           ),
         ),
       ),
     );
   }
-}
 
-// --- WIDGET DIALOG EDIT TERPISAH ---
-class EditProductDialog extends StatefulWidget {
-  final Map<String, dynamic> product;
-  final VoidCallback onSuccess;
-
-  const EditProductDialog(
-      {super.key, required this.product, required this.onSuccess});
-
-  @override
-  State<EditProductDialog> createState() => _EditProductDialogState();
-}
-
-class _EditProductDialogState extends State<EditProductDialog> {
-  final _formKey = GlobalKey<FormState>();
-  late TextEditingController _nameController;
-  late TextEditingController _priceController;
-  File? _newImage;
-  bool _isSaving = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.product['name']);
-    _priceController =
-        TextEditingController(text: widget.product['price'].toString());
-  }
-
-  Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
-    if (picked != null) setState(() => _newImage = File(picked.path));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Edit Product"),
-      content: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  height: 100,
-                  width: 100,
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                    image: _newImage != null
-                        ? DecorationImage(
-                            image: FileImage(_newImage!), fit: BoxFit.cover)
-                        : DecorationImage(
-                            image: NetworkImage(
-                                "http://10.0.2.2:4001${widget.product['imageUrl']}"),
-                            fit: BoxFit.cover,
-                          ),
-                  ),
-                  child: const Icon(Icons.camera_alt, color: Colors.white70),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: "Nama Produk"),
-                validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
-              ),
-              TextFormField(
-                controller: _priceController,
-                decoration: const InputDecoration(labelText: "Harga"),
-                keyboardType: TextInputType.number,
-                validator: (v) => v!.isEmpty ? "Wajib diisi" : null,
-              ),
-            ],
-          ),
-        ),
+  Widget _buildImageWidget(String url) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 12),
+      width: 85,
+      height: 85,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        color: Colors.grey.shade100,
       ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Batal")),
-        ElevatedButton(
-          onPressed: _isSaving ? null : _handleUpdate,
-          child: _isSaving
-              ? const SizedBox(
-                  height: 15,
-                  width: 15,
-                  child: CircularProgressIndicator(strokeWidth: 2))
-              : const Text("Simpan"),
-        ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: url.isEmpty
+            ? _buildPlaceholder()
+            : Image.network(
+                url,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+                  dev.log("Gagal load gambar: $url");
+                  return _buildPlaceholder();
+                },
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2));
+                },
+              ),
+      ),
+    );
+  }
+
+  Widget _buildPlaceholder() {
+    return Container(
+      color: Colors.grey.shade100,
+      child: Icon(Icons.broken_image_outlined,
+          color: Colors.grey.shade400, size: 30),
+    );
+  }
+
+  Widget _buildCategoryBadge(String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: primaryBlue.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+            color: primaryBlue, fontWeight: FontWeight.bold, fontSize: 12),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons() {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildSmallActionBtn(Icons.edit_rounded, Colors.orange, () {}),
+        const SizedBox(width: 12),
+        _buildSmallActionBtn(Icons.delete_rounded, Colors.red, () {}),
       ],
     );
   }
 
-  Future<void> _handleUpdate() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isSaving = true);
-
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token') ?? "";
-
-    final success = await ProductService().updateProduct(
-      id: widget.product['id'],
-      name: _nameController.text,
-      price: int.parse(_priceController.text),
-      categoryId: widget.product['categoryId'], // Tetap kategori lama
-      imageFile: _newImage,
-      token: token,
+  Widget _buildSmallActionBtn(IconData icon, Color color, VoidCallback onTap) {
+    return IconButton.filledTonal(
+      onPressed: onTap,
+      icon: Icon(icon, size: 20),
+      style: IconButton.styleFrom(
+        backgroundColor: color.withOpacity(0.1),
+        foregroundColor: color,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
     );
-
-    if (success) widget.onSuccess();
-    setState(() => _isSaving = false);
   }
 }
